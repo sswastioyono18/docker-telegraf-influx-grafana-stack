@@ -5,37 +5,24 @@ services:
     public: true
     volumes:
     - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    depends_on:
-      - influxdb
-    links:
-      - influxdb
-    networks:
-      - kb-backend
     ports:
-    - '8125:8125/udp'
+    - 8125/udp
 
   influxdb:
     image: influxdb:1.8-alpine
+    public: true
     env_file: configuration.env
-    networks:
-      - kb-backend
     ports:
-      - '8086:8086'
+      - 8086
     volumes:
       - ./:/imports
       - influxdb_data:/var/lib/influxdb
 
   grafana:
     image: grafana/grafana:latest
-    depends_on:
-      - influxdb
     env_file: configuration.env
-    networks:
-      - kb-backend
-    links:
-      - influxdb
     ports:
-      - '3000:3000'
+      - 3000
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
@@ -44,9 +31,3 @@ services:
 volumes:
   grafana_data: {}
   influxdb_data: {}
-
-
-networks:
-  kb-backend:
-    external: false
-    name: kb-backend
